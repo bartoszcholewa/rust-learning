@@ -5,7 +5,7 @@ async fn main() {
     let server = HttpServer::new(|| {
         App::new()
             .route("/", web::get().to(get_index))
-            .route("/gcd", web::post().to(post_gcd))
+            .route("/gdc", web::post().to(post_gcd))
     });
 
     println!("Serving on http://localhost:3000...");
@@ -18,7 +18,7 @@ async fn main() {
 
 async fn get_index() -> HttpResponse {
     HttpResponse::Ok()
-        .content_type("text/html")
+        .content_type("text/html; charset=utf-8")
         .body(
             r#"
                 <title>Kalkulator GCD</title>
@@ -48,9 +48,24 @@ async fn post_gcd(form: web::Form<GcdParameters>) -> HttpResponse {
     let response =
         format!("Największym wspólnym dzielnikiem liczb {} i {} \
                 jest <b>{}</b>\n",
-                form.n, form.m, gcd(form.n, form.m));
+                form.n, form.m, gdc(form.n, form.m));
+
+    println!("{}", response);
 
     HttpResponse::Ok()
-        .content_type("text/html")
+        .content_type("text/html; charset=utf-8")
         .body(response)
+}
+
+fn gdc(mut n: u64, mut m: u64) -> u64 {
+    assert!(n != 0 && m != 0);
+    while m != 0 {
+        if m < n {
+            let t = m;
+            m = n;
+            n = t;
+        }
+        m = m % n;
+    }
+    n
 }
